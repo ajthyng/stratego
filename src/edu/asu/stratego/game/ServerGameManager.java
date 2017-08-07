@@ -84,7 +84,7 @@ public class ServerGameManager implements Runnable {
             fromPlayerTwo = new ObjectInputStream(socketTwo.getInputStream());
         }
         catch(IOException e) {
-            // TODO Handle this exception somehow...
+			System.out.println("Exception thrown " + e);
             e.printStackTrace();
         }
     }
@@ -113,7 +113,7 @@ public class ServerGameManager implements Runnable {
             toPlayerTwo.writeObject(playerOne);
         }
         catch(ClassNotFoundException | IOException e) {
-            // TODO Handle this exception somehow...
+			System.out.println("Exception thrown " + e);
             e.printStackTrace();
         }
     }
@@ -315,7 +315,7 @@ public class ServerGameManager implements Runnable {
     		
     	else if(isCaptured(PieceColor.BLUE))
     		return GameStatus.BLUE_CAPTURED;
-    	
+
     	return GameStatus.IN_PROGRESS;
     }
     

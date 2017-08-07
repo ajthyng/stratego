@@ -23,8 +23,9 @@ public final class ClientSocket {
      * @param serverIP server IP address
      * @param port server port number
      */
+    // remove UnknownHostException it is already a part of IOException
     public static void connect(String serverIP, int port) 
-            throws UnknownHostException, IOException {
+            throws IOException {
         socket = new Socket(serverIP, port);
     }
     
