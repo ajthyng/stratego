@@ -46,7 +46,7 @@ public class ClientGameManager implements Runnable {
      * See ServerGameManager's run() method to understand how the client
      * interacts with the server.
      *
-     * @see edu.asu.stratego.Game.ServerGameManager
+     * @see edu.asu.stratego.game.ServerGameManager
      */
     @Override
     public void run() {
@@ -165,6 +165,16 @@ public class ClientGameManager implements Runnable {
         }
     }
 
+    private int calculateShift(int move) {
+        if (move < 0) {
+            return -1;
+        }
+        if (move > 0) {
+            return 1;
+        }
+        return 0;
+    }
+
     private void playGame() {
         // Remove setup panel
         Platform.runLater(() -> {
@@ -222,13 +232,8 @@ public class ClientGameManager implements Runnable {
                         if(Math.abs(moveX) > 1 || Math.abs(moveY) > 1) {
                             Platform.runLater(() -> {
                                 try{
-                                    int shiftX = 0;
-                                    int shiftY = 0;
-
-                                    if(moveX > 0) {shiftX = 1;}
-                                    else if(moveX < 0) {shiftX = -1;}
-                                    else if(moveY > 0) {shiftY = 1;}
-                                    else if(moveY < 0) {shiftY = -1;}
+                                    int shiftX = calculateShift(moveX);
+                                    int shiftY = calculateShift(moveY);
 
                                     // Move the scout in front of the piece it's attacking before actually fading out
                                     ClientSquare scoutSquare = Game.getBoard().getSquare(Game.getMove().getEnd().x+shiftX, Game.getMove().getEnd().y+shiftY);
@@ -237,7 +242,6 @@ public class ClientGameManager implements Runnable {
                                     startSquare.getPiecePane().setPiece(null);
                                 }
                                 catch (Exception e) {
-                                    // TODO Handle this somehow...
                                     e.printStackTrace();
                                 }
                             });
@@ -262,21 +266,16 @@ public class ClientGameManager implements Runnable {
                         }
                     }
                     Platform.runLater(() -> {
-                        try {
-                            // Set the face images visible to both players (from the back that doesn't show piecetype)
-                            ClientSquare startSquare = Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y);
-                            ClientSquare endSquare = Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y);
+                        // Set the face images visible to both players (from the back that doesn't show piecetype)
+                        ClientSquare startSquare = Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y);
+                        ClientSquare endSquare = Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y);
 
-                            Piece animStartPiece = startSquare.getPiece();
-                            Piece animEndPiece = endSquare.getPiece();
+                        Piece animStartPiece = startSquare.getPiece();
+                        Piece animEndPiece = endSquare.getPiece();
 
-                            startSquare.getPiecePane().setPiece(HashTables.PIECE_MAP.get(animStartPiece.getPieceSpriteKey()));
-                            endSquare.getPiecePane().setPiece(HashTables.PIECE_MAP.get(animEndPiece.getPieceSpriteKey()));
-                        }
-                        catch (Exception e) {
-                            // TODO Handle this somehow...
-                            e.printStackTrace();
-                        }
+                        startSquare.getPiecePane().setPiece(HashTables.PIECE_MAP.get(animStartPiece.getPieceSpriteKey()));
+                        endSquare.getPiecePane().setPiece(HashTables.PIECE_MAP.get(animEndPiece.getPieceSpriteKey()));
+
                     });
 
                     // Wait three seconds (the image is shown to client, then waits 2 seconds)
@@ -289,15 +288,14 @@ public class ClientGameManager implements Runnable {
                             ClientSquare endSquare = Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y);
 
                             // If the piece dies, fade it out (also considers a draw, where both "win" are set to false)
-                            if(Game.getMove().isAttackWin() == false) {
+                            if(!Game.getMove().isAttackWin()) {
                                 fadePieceImage(startSquare);
                             }
-                            if(Game.getMove().isDefendWin() == false) {
+                            if(!Game.getMove().isDefendWin()) {
                                 fadePieceImage(endSquare);
                             }
                         }
                         catch (Exception e) {
-                            // TODO Handle this somehow...
                             e.printStackTrace();
                         }
                     });
