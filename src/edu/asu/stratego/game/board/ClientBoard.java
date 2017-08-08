@@ -42,8 +42,8 @@ public class ClientBoard {
      * @return the square located at (row, col)
      */
     public ClientSquare getSquare(int row, int col) {
-        if (row < 0 || row >= size) { throw new RuntimeException("Invalid square request"); }
-        if (col < 0 || col >= size) { throw new RuntimeException("Invalid square request"); }
+        if (row < 0 || row >= size) { return null; }
+        if (col < 0 || col >= size) { return null; }
         return squares[row][col];
     }
     

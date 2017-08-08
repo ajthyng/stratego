@@ -155,7 +155,7 @@ public class ServerGameManager implements Runnable {
 				}
 			}
 
-			GameStatus winCondition = checkWinCondition();
+			GameStatus winCondition = checkWinCondition(board);
 
 			toPlayerOne.writeObject(setupBoardTwo);
 			toPlayerTwo.writeObject(setupBoardOne);
@@ -283,7 +283,7 @@ public class ServerGameManager implements Runnable {
 					}
 				}
 
-				GameStatus winCondition = checkWinCondition();
+				GameStatus winCondition = checkWinCondition(board);
 
 				toPlayerOne.writeObject(moveToPlayerOne);
 				toPlayerTwo.writeObject(moveToPlayerTwo);
@@ -307,23 +307,29 @@ public class ServerGameManager implements Runnable {
 		}
 	}
 
-	private GameStatus checkWinCondition() {
-		if(!hasAvailableMoves(PieceColor.RED))
+	private GameStatus checkWinCondition(ServerBoard board) {
+		if(!hasAvailableMoves(PieceColor.RED, board)) {
+			if (!hasAvailableMoves(PieceColor.BLUE, board)) {
+				return GameStatus.TIE_GAME;
+			}
 			return GameStatus.RED_NO_MOVES;
+		}
 
-		else if(isCaptured(PieceColor.RED))
-			return GameStatus.RED_CAPTURED;
-
-		if(!hasAvailableMoves(PieceColor.BLUE))
+		if(!hasAvailableMoves(PieceColor.BLUE, board)) {
 			return GameStatus.BLUE_NO_MOVES;
+		}
 
-		else if(isCaptured(PieceColor.BLUE))
+		if(isCaptured(PieceColor.RED, board)) {
+			return GameStatus.RED_CAPTURED;
+		}
+
+		if(isCaptured(PieceColor.BLUE, board))
 			return GameStatus.BLUE_CAPTURED;
 
 		return GameStatus.IN_PROGRESS;
 	}
 
-	private boolean isCaptured(PieceColor inColor) {
+	private boolean isCaptured(PieceColor inColor, ServerBoard board) {
 		if(playerOne.getColor() == inColor) {
 			if(board.getSquare(playerOneFlag.x, playerOneFlag.y).getPiece().getPieceType() != PieceType.FLAG)
 				return true;
@@ -335,7 +341,7 @@ public class ServerGameManager implements Runnable {
 		return false;
 	}
 
-	private boolean hasAvailableMoves(PieceColor inColor) {
+	private boolean hasAvailableMoves(PieceColor inColor, ServerBoard board) {
 		for(int row = 0; row < 10; ++row) {
 			for(int col = 0; col < 10; ++col) {
 				Piece current = board.getSquare(row, col).getPiece();
