@@ -290,18 +290,10 @@ public class ClientGameManager implements Runnable {
 
                             // If the piece dies, fade it out (also considers a draw, where both "win" are set to false)
                             if(Game.getMove().isAttackWin() == false) {
-                                FadeTransition fadeStart = new FadeTransition(Duration.millis(1500), startSquare.getPiecePane().getPiece());
-                                fadeStart.setFromValue(1.0);
-                                fadeStart.setToValue(0.0);
-                                fadeStart.play();
-                                fadeStart.setOnFinished(new ResetImageVisibility());
+                                fadePieceImage(startSquare);
                             }
                             if(Game.getMove().isDefendWin() == false) {
-                                FadeTransition fadeEnd = new FadeTransition(Duration.millis(1500), endSquare.getPiecePane().getPiece());
-                                fadeEnd.setFromValue(1.0);
-                                fadeEnd.setToValue(0.0);
-                                fadeEnd.play();
-                                fadeEnd.setOnFinished(new ResetImageVisibility());
+                                fadePieceImage(endSquare);
                             }
                         }
                         catch (Exception e) {
@@ -367,11 +359,7 @@ public class ClientGameManager implements Runnable {
                         arrowSquare.getPiecePane().getPiece().setRotate(270);
 
                     // Fade out the arrow
-                    FadeTransition ft = new FadeTransition(Duration.millis(1500), arrowSquare.getPiecePane().getPiece());
-                    ft.setFromValue(1.0);
-                    ft.setToValue(0.0);
-                    ft.play();
-                    ft.setOnFinished(new ResetSquareImage());
+                    fadeArrowImage(arrowSquare);
                 });
 
                 // Wait for fade animation to complete before continuing.
@@ -387,6 +375,22 @@ public class ClientGameManager implements Runnable {
         }
 
         revealAll();
+    }
+
+    private void fadePieceImage(ClientSquare endSquare) {
+        FadeTransition fadeEnd = new FadeTransition(Duration.millis(1500), endSquare.getPiecePane().getPiece());
+        fadeEnd.setFromValue(1.0);
+        fadeEnd.setToValue(0.0);
+        fadeEnd.play();
+        fadeEnd.setOnFinished(new ResetImageVisibility());
+    }
+
+    private void fadeArrowImage(ClientSquare arrowSquare) {
+        FadeTransition ft = new FadeTransition(Duration.millis(1500), arrowSquare.getPiecePane().getPiece());
+        ft.setFromValue(1.0);
+        ft.setToValue(0.0);
+        ft.play();
+        ft.setOnFinished(new ResetSquareImage());
     }
 
     public static Object getSendMove() {
