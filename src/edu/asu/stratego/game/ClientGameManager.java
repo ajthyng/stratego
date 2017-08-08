@@ -158,9 +158,13 @@ public class ClientGameManager implements Runnable {
                         }
                     }
                 });
-            }
-            catch (InterruptedException | IOException | ClassNotFoundException e) {
-                // TODO Handle this exception somehow...
+            } catch (InterruptedException intExc) {
+                Thread.currentThread().interrupt();
+                System.out.println("Opponent Disconnected.");
+                intExc.printStackTrace();
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Exception Thrown " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -367,7 +371,7 @@ public class ClientGameManager implements Runnable {
                 Game.setStatus((GameStatus) fromServer.readObject());
             }
             catch (ClassNotFoundException | IOException | InterruptedException e) {
-                // TODO Handle this exception somehow...
+                Game.setStatus(GameStatus.CONNECTION_LOST);
                 e.printStackTrace();
             }
         }
