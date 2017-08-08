@@ -12,7 +12,5 @@ public enum GameStatus {
     RED_NO_MOVES,
     BLUE_NO_MOVES,
     CONNECTION_LOST,
-    RED_FLAG_UNREACHABLE,
-    BLUE_FLAG_UNREACHABLE;
+    TIE_GAME
 }
-// added connection lost and removed individual red and blue disconnected.

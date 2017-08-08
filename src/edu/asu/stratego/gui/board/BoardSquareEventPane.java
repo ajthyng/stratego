@@ -1,30 +1,22 @@
 package edu.asu.stratego.gui.board;
 
-import java.awt.Point;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.*;
-
 import edu.asu.stratego.game.*;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.effect.Glow;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-
 import edu.asu.stratego.game.board.ClientSquare;
 import edu.asu.stratego.gui.board.setup.SetupPanel;
 import edu.asu.stratego.gui.board.setup.SetupPieces;
 import edu.asu.stratego.media.ImageConstants;
 import edu.asu.stratego.util.HashTables;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.effect.Glow;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * A single square within the BoardEventPane.
@@ -44,6 +36,7 @@ public class BoardSquareEventPane extends GridPane {
         hover.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, new OnHover());
         hover.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, new OffHover());
         hover.addEventHandler(MouseEvent.MOUSE_CLICKED, new SelectSquare());
+        hover.addEventHandler(KeyEvent.KEY_PRESSED, new DoRandomSetup());
         
         this.getChildren().add(hover);
     }
@@ -121,7 +114,17 @@ public class BoardSquareEventPane extends GridPane {
         else
             invalidMove(hover);
     }
-    
+
+    private class DoRandomSetup implements EventHandler<KeyEvent> {
+
+        @Override
+        public void handle(KeyEvent event) {
+            if (event.isAltDown()) {
+                randomSetup();
+            }
+        }
+    }
+
     /**
      * This event is fired when the player clicks on the event square. 
      */
