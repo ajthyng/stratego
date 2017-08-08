@@ -336,7 +336,7 @@ public class ServerGameManager implements Runnable {
 			for(int col = 0; col < 10; ++col) {
 				Piece current = board.getSquare(row, col).getPiece();
 				if(current != null && current.getPieceColor() == inColor) {
-					if(computeValidMoves(row, col, current).size() > 0) {
+					if(computeValidMoves(row, col, current, board).size() > 0) {
 						return true;
 					}
 				}
@@ -346,7 +346,7 @@ public class ServerGameManager implements Runnable {
 		return false;
 	}
 
-	private ArrayList<Point> computeValidMoves(int row, int col, Piece piece) {
+	private ArrayList<Point> computeValidMoves(int row, int col, Piece piece, ServerBoard board) {
 		int max = 1;
 		PieceType pieceType = piece.getPieceType();
 		PieceColor inColor = piece.getPieceColor();
@@ -358,11 +358,11 @@ public class ServerGameManager implements Runnable {
 		if(pieceType != PieceType.BOMB && pieceType != PieceType.FLAG) {
 			// Negative Row (UP)
 			for(int i = -1; i >= -max; --i) {
-				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col) && !isOpponentPiece(row+i, col, inColor)))) {
-					if(isNullPiece(row+i, col) || isOpponentPiece(row+i, col, inColor)) {
+				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
+					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
 						validMoves.add(new Point(row+i, col));
 
-						if(!isNullPiece(row+i, col) && isOpponentPiece(row+i, col, inColor))
+						if(!isNullPiece(row+i, col, board) && isOpponentPiece(row+i, col, inColor, board))
 							break;
 					}
 					else
@@ -373,11 +373,11 @@ public class ServerGameManager implements Runnable {
 			}
 			// Positive Col (RIGHT)
 			for(int i = 1; i <= max; ++i) {
-				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i) && !isOpponentPiece(row, col+i, inColor)))) {
-					if(isNullPiece(row, col+i) || isOpponentPiece(row, col+i, inColor)) {
+				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
+					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
 						validMoves.add(new Point(row, col+i));
 
-						if(!isNullPiece(row, col+i) && isOpponentPiece(row, col+i, inColor))
+						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
 							break;
 					}
 					else
@@ -388,11 +388,11 @@ public class ServerGameManager implements Runnable {
 			}
 			// Positive Row (DOWN)
 			for(int i = 1; i <= max; ++i) {
-				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col) && !isOpponentPiece(row+i, col, inColor)))) {
-					if(isNullPiece(row+i, col) || isOpponentPiece(row+i, col, inColor)) {
+				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
+					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
 						validMoves.add(new Point(row+i, col));
 
-						if(!isNullPiece(row+i, col) && isOpponentPiece(row+i, col, inColor))
+						if(!isNullPiece(row+i, col, board) && isOpponentPiece(row+i, col, inColor, board))
 							break;
 					}
 					else
@@ -403,11 +403,11 @@ public class ServerGameManager implements Runnable {
 			}
 			// Negative Col (LEFT)
 			for(int i = -1; i >= -max; --i) {
-				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i) && !isOpponentPiece(row, col+i, inColor)))) {
-					if(isNullPiece(row, col+i) || isOpponentPiece(row, col+i, inColor)) {
+				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
+					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
 						validMoves.add(new Point(row, col+i));
 
-						if(!isNullPiece(row, col+i) && isOpponentPiece(row, col+i, inColor))
+						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
 							break;
 					}
 					else
@@ -437,10 +437,10 @@ public class ServerGameManager implements Runnable {
 
 		return true;
 	}
-	private boolean isOpponentPiece(int row, int col, PieceColor inColor) {
+	private boolean isOpponentPiece(int row, int col, PieceColor inColor, ServerBoard board) {
 		return board.getSquare(row, col).getPiece().getPieceColor() != inColor;
 	}
-	private boolean isNullPiece(int row, int col) {
+	private boolean isNullPiece(int row, int col, ServerBoard board) {
 		return board.getSquare(row, col).getPiece() == null;
 	}
 }
