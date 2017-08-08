@@ -107,6 +107,15 @@ public class ClientGameManager implements Runnable {
             toServer = new ObjectOutputStream(ClientSocket.getInstance().getOutputStream());
             fromServer = new ObjectInputStream(ClientSocket.getInstance().getInputStream());
 
+            // Install shutdown hook if client disconnects from server
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    toServer.writeObject(new String("Client is disconnecting"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }));
+
             // Exchange player information.
             toServer.writeObject(Game.getPlayer());
             Game.setOpponent((Player) fromServer.readObject());

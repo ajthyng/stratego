@@ -6,8 +6,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import edu.asu.stratego.game.board.ServerBoard;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Task to manage a Stratego game between two clients.
@@ -66,7 +72,6 @@ public class ServerGameManager implements Runnable {
         createIOStreams();
         exchangePlayers();
         exchangeSetup();
-        
         playGame();
     }
 
@@ -120,8 +125,35 @@ public class ServerGameManager implements Runnable {
     
     private void exchangeSetup() {
         try {
-            SetupBoard setupBoardOne = (SetupBoard) fromPlayerOne.readObject();
-            SetupBoard setupBoardTwo = (SetupBoard) fromPlayerTwo.readObject();
+        	SetupBoard setupBoardOne;
+			SetupBoard setupBoardTwo;
+			ExecutorService executor = Executors.newFixedThreadPool(2);
+			Future<Object> bOne;
+			Future<Object> bTwo;
+
+			Callable<Object> boardOne = new BoardCallable(fromPlayerOne);
+			Callable<Object> boardTwo = new BoardCallable(fromPlayerTwo);
+			bOne = executor.submit(boardOne);
+			bTwo = executor.submit(boardTwo);
+
+			while (!bOne.isDone() && !bTwo.isDone()) {
+				sleep(100);
+			}
+			if (bOne.isDone()) {
+				setupBoardOne = (SetupBoard) bOne;
+				while (!bTwo.isDone()) {
+					sleep(100);
+				}
+				setupBoardTwo = (SetupBoard) bTwo;
+			} else {
+				setupBoardTwo = (SetupBoard) bTwo;
+				while (!bOne.isDone()) {
+					sleep(100);
+				}
+				setupBoardOne = (SetupBoard) bOne;
+			}
+			
+			
             
             // Register pieces on the server board.
             for (int row = 0; row < 4; ++row) {
@@ -159,12 +191,25 @@ public class ServerGameManager implements Runnable {
             toPlayerOne.writeObject(winCondition);
             toPlayerTwo.writeObject(winCondition);
         }
-        catch (ClassNotFoundException | IOException e) {
-            // TODO Handle this exception somehow...
-            e.printStackTrace();
-        }
-        
-    }
+        catch (ClassCastException | IOException e) {
+        	try {
+				toPlayerOne.writeObject("disconnected");
+				socketOne.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+
+			try {
+				toPlayerTwo.writeObject("disconnected");
+				socketTwo.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			System.out.println(session + "Error occurred during network I/O");
+        } catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
     
     private void playGame() {       
         while (true) {
@@ -295,11 +340,22 @@ public class ServerGameManager implements Runnable {
                     turn = PieceColor.RED;
                 
                 // Check win conditions.
-            }
-            catch (IOException | ClassNotFoundException e) {
-                System.out.println(session + "Error occurred during network I/O");
-                return;
-            }
+            } catch (IOException | ClassNotFoundException e) {
+				System.out.println(session + "Error occurred during network I/O");
+				return;
+			} finally {
+				try {
+            		socketTwo.close();
+				} catch (IOException twoExc) {
+					twoExc.printStackTrace();
+				}
+
+				try {
+            		socketOne.close();
+				} catch (IOException oneExc) {
+					oneExc.printStackTrace();
+				}
+			}
         }
     }
     

@@ -1,23 +1,25 @@
 package edu.asu.stratego.gui.board;
 
 import java.awt.Point;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.concurrent.*;
 
+import edu.asu.stratego.game.*;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 
-import edu.asu.stratego.game.ClientGameManager;
-import edu.asu.stratego.game.Game;
-import edu.asu.stratego.game.GameStatus;
-import edu.asu.stratego.game.MoveStatus;
-import edu.asu.stratego.game.Piece;
-import edu.asu.stratego.game.PieceColor;
-import edu.asu.stratego.game.PieceType;
 import edu.asu.stratego.game.board.ClientSquare;
 import edu.asu.stratego.gui.board.setup.SetupPanel;
 import edu.asu.stratego.gui.board.setup.SetupPieces;
@@ -126,6 +128,8 @@ public class BoardSquareEventPane extends GridPane {
     private class SelectSquare implements EventHandler<MouseEvent> {
         @Override
         public void handle(MouseEvent e) {
+            //TODO: Implement server connection health check on player click
+
             // Square position.
         	ImageView source = (ImageView) e.getSource();
         	
