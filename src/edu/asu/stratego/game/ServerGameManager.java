@@ -35,6 +35,10 @@ public class ServerGameManager implements Runnable {
 	private Socket socketOne;
 	private Socket socketTwo;
 
+	private enum Direction {
+		UP, DOWN, LEFT, RIGHT
+	}
+
 	/**
 	 * Creates a new instance of ServerGameManager.
 	 *
@@ -336,7 +340,7 @@ public class ServerGameManager implements Runnable {
 			for(int col = 0; col < 10; ++col) {
 				Piece current = board.getSquare(row, col).getPiece();
 				if(current != null && current.getPieceColor() == inColor) {
-					if(computeValidMoves(row, col, current, board).size() > 0) {
+					if(computeValidMoves(row, col, current, board)) {
 						return true;
 					}
 				}
@@ -346,7 +350,53 @@ public class ServerGameManager implements Runnable {
 		return false;
 	}
 
-	private ArrayList<Point> computeValidMoves(int row, int col, Piece piece, ServerBoard board) {
+	private boolean checkRowForMoves(int row, int col, Piece piece, ServerBoard board, Direction dir) {
+		int max = 1;
+		PieceColor inColor = piece.getPieceColor();
+		if (piece.getPieceType() == PieceType.SCOUT) {
+			max = 8;
+		}
+		int modifier = 1, colMod = 0, rowMod = 0;
+		switch (dir) {
+			case UP:
+				modifier = -1;
+				rowMod = modifier;
+				break;
+			case DOWN:
+				modifier = 1;
+				rowMod = modifier;
+				break;
+			case LEFT:
+				modifier = -1;
+				colMod = modifier;
+				break;
+			case RIGHT:
+				modifier = 1;
+				colMod = modifier;
+				break;
+			default:
+				break;
+		}
+		//Negative Row (UP)
+		for(int i = modifier; i >= modifier*max; i += modifier) {
+			if (rowMod != 0) {
+				row = row + rowMod;
+				rowMod += modifier;
+			}
+			if (colMod != 0) {
+				col = col + colMod;
+				colMod += modifier;
+			}
+			if (isInBounds(row, col) && (!isLake(row, col) || (!isNullPiece(row, col, board) && !isOpponentPiece(row, col, inColor, board)))) {
+				if (isNullPiece(row, col, board) || isOpponentPiece(row, col, inColor, board)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean computeValidMoves(int row, int col, Piece piece, ServerBoard board) {
 		int max = 1;
 		PieceType pieceType = piece.getPieceType();
 		PieceColor inColor = piece.getPieceColor();
@@ -357,6 +407,19 @@ public class ServerGameManager implements Runnable {
 
 		if(pieceType != PieceType.BOMB && pieceType != PieceType.FLAG) {
 			// Negative Row (UP)
+			if (checkRowForMoves(row, col, piece, board, Direction.UP)) {
+				return true;
+			}
+
+			if (checkRowForMoves(row, col, piece, board, Direction.DOWN)) {
+				return true;
+			}
+			if (checkRowForMoves(row, col, piece, board, Direction.LEFT)) {
+				return true;
+			}
+			if (checkRowForMoves(row, col, piece, board, Direction.RIGHT)) {
+				return true;
+			}
 			for(int i = -1; i >= -max; --i) {
 				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
 					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
@@ -371,54 +434,54 @@ public class ServerGameManager implements Runnable {
 				else
 					break;
 			}
-			// Positive Col (RIGHT)
-			for(int i = 1; i <= max; ++i) {
-				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
-					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
-						validMoves.add(new Point(row, col+i));
-
-						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
-							break;
-					}
-					else
-						break;
-				}
-				else
-					break;
-			}
-			// Positive Row (DOWN)
-			for(int i = 1; i <= max; ++i) {
-				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
-					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
-						validMoves.add(new Point(row+i, col));
-
-						if(!isNullPiece(row+i, col, board) && isOpponentPiece(row+i, col, inColor, board))
-							break;
-					}
-					else
-						break;
-				}
-				else
-					break;
-			}
-			// Negative Col (LEFT)
-			for(int i = -1; i >= -max; --i) {
-				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
-					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
-						validMoves.add(new Point(row, col+i));
-
-						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
-							break;
-					}
-					else
-						break;
-				}
-				else
-					break;
-			}
+//			// Positive Col (RIGHT)
+//			for(int i = 1; i <= max; ++i) {
+//				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
+//					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
+//						validMoves.add(new Point(row, col+i));
+//
+//						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
+//							break;
+//					}
+//					else
+//						break;
+//				}
+//				else
+//					break;
+//			}
+//			// Positive Row (DOWN)
+//			for(int i = 1; i <= max; ++i) {
+//				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
+//					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
+//						validMoves.add(new Point(row+i, col));
+//
+//						if(!isNullPiece(row+i, col, board) && isOpponentPiece(row+i, col, inColor, board))
+//							break;
+//					}
+//					else
+//						break;
+//				}
+//				else
+//					break;
+//			}
+//			// Negative Col (LEFT)
+//			for(int i = -1; i >= -max; --i) {
+//				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
+//					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
+//						validMoves.add(new Point(row, col+i));
+//
+//						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
+//							break;
+//					}
+//					else
+//						break;
+//				}
+//				else
+//					break;
+//			}
 		}
 
-		return validMoves;
+		return false;
 	}
 
 	private static boolean isLake(int row, int col) {
