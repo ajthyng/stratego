@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import edu.asu.stratego.gui.board.BoardSquarePane;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -408,12 +409,27 @@ public class ClientGameManager implements Runnable {
         Platform.runLater(() -> {
             for(int row = 0; row < 10; row++) {
                 for(int col = 0; col < 10; col++) {
-                    if(Game.getBoard().getSquare(row, col).getPiece() != null && Game.getBoard().getSquare(row, col).getPiece().getPieceColor() != Game.getPlayer().getColor()) {
-                        Game.getBoard().getSquare(row, col).getPiecePane().setPiece(HashTables.PIECE_MAP.get(Game.getBoard().getSquare(row, col).getPiece().getPieceSpriteKey()));
+                    Piece piece = Game.getBoard().getSquare(row, col).getPiece();
+                    PieceColor playerColor = Game.getPlayer().getColor();
+                    boolean squareHasPiece = piece != null;
+                    boolean isOpponentPiece = squareHasPiece && piece.getPieceColor() != playerColor;
+                    if (isOpponentPiece) {
+                        BoardSquarePane piecePane = Game.getBoard().getSquare(row, col).getPiecePane();
+                        piecePane.setPiece(HashTables.PIECE_MAP.get(piece.getPieceSpriteKey()));
                     }
                 }
             }
         });
+    }
+
+    private void fadeSquare(Object wait) {
+        wait.notify();
+        Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().getPiece().setOpacity(1.0);
+        Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().getPiece().setRotate(0.0);
+        Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().setPiece(null);
+
+        Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y).getPiecePane().getPiece().setOpacity(1.0);
+        Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y).getPiecePane().getPiece().setRotate(0.0);
     }
 
     // Finicky, ill-advised to edit. Resets the opacity, rotation, and piece to null
@@ -422,13 +438,7 @@ public class ClientGameManager implements Runnable {
         @Override
         public void handle(ActionEvent event) {
             synchronized (waitFade) {
-                waitFade.notify();
-                Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().getPiece().setOpacity(1.0);
-                Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().getPiece().setRotate(0.0);
-                Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().setPiece(null);
-
-                Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y).getPiecePane().getPiece().setOpacity(1.0);
-                Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y).getPiecePane().getPiece().setRotate(0.0);
+                fadeSquare(waitFade);
             }
         }
     }
@@ -437,13 +447,7 @@ public class ClientGameManager implements Runnable {
         @Override
         public void handle(ActionEvent event) {
             synchronized (waitVisible) {
-                waitVisible.notify();
-                Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().getPiece().setOpacity(1.0);
-                Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().getPiece().setRotate(0.0);
-                Game.getBoard().getSquare(Game.getMove().getStart().x, Game.getMove().getStart().y).getPiecePane().setPiece(null);
-
-                Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y).getPiecePane().getPiece().setOpacity(1.0);
-                Game.getBoard().getSquare(Game.getMove().getEnd().x, Game.getMove().getEnd().y).getPiecePane().getPiece().setRotate(0.0);
+                fadeSquare(waitVisible);
             }
         }
     }
