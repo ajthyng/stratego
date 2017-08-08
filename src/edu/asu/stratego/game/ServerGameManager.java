@@ -308,23 +308,24 @@ public class ServerGameManager implements Runnable {
 	}
 
 	private GameStatus checkWinCondition(ServerBoard board) {
-		if(!hasAvailableMoves(PieceColor.RED, board)) {
-			if (!hasAvailableMoves(PieceColor.BLUE, board)) {
-				return GameStatus.TIE_GAME;
-			}
-			return GameStatus.RED_NO_MOVES;
-		}
+		 if(!hasAvailableMoves(PieceColor.RED, board)) {
+		 	if (!hasAvailableMoves(PieceColor.BLUE, board)) {
+		 		return GameStatus.TIE_GAME;
+		 	}
+		 	return GameStatus.RED_NO_MOVES;
+		 }
 
-		if(!hasAvailableMoves(PieceColor.BLUE, board)) {
-			return GameStatus.BLUE_NO_MOVES;
-		}
+		 if(!hasAvailableMoves(PieceColor.BLUE, board)) {
+		 	return GameStatus.BLUE_NO_MOVES;
+		 }
 
-		if(isCaptured(PieceColor.RED, board)) {
-			return GameStatus.RED_CAPTURED;
-		}
+		 if(isCaptured(PieceColor.RED, board)) {
+		 	return GameStatus.RED_CAPTURED;
+		 }
 
-		if(isCaptured(PieceColor.BLUE, board))
-			return GameStatus.BLUE_CAPTURED;
+		 if(isCaptured(PieceColor.BLUE, board)) {
+		 	return GameStatus.BLUE_CAPTURED;
+		 }
 
 		return GameStatus.IN_PROGRESS;
 	}
@@ -342,8 +343,8 @@ public class ServerGameManager implements Runnable {
 	}
 
 	private boolean hasAvailableMoves(PieceColor inColor, ServerBoard board) {
-		for(int row = 0; row < 10; ++row) {
-			for(int col = 0; col < 10; ++col) {
+		for(int row = 0; row < 10; row++) {
+			for(int col = 0; col < 10; col++) {
 				Piece current = board.getSquare(row, col).getPiece();
 				if(current != null && current.getPieceColor() == inColor) {
 					if(computeValidMoves(row, col, current, board)) {
@@ -384,7 +385,7 @@ public class ServerGameManager implements Runnable {
 				break;
 		}
 		//Negative Row (UP)
-		for(int i = modifier; i >= modifier*max; i += modifier) {
+		for(int i = 0; i < max; i++) {
 			if (rowMod != 0) {
 				row = row + rowMod;
 				rowMod += modifier;
@@ -410,13 +411,12 @@ public class ServerGameManager implements Runnable {
 			max = 8;
 
 		ArrayList<Point> validMoves = new ArrayList<Point>();
-
+//
 		if(pieceType != PieceType.BOMB && pieceType != PieceType.FLAG) {
 			// Negative Row (UP)
 			if (checkRowForMoves(row, col, piece, board, Direction.UP)) {
 				return true;
 			}
-
 			if (checkRowForMoves(row, col, piece, board, Direction.DOWN)) {
 				return true;
 			}
@@ -426,7 +426,7 @@ public class ServerGameManager implements Runnable {
 			if (checkRowForMoves(row, col, piece, board, Direction.RIGHT)) {
 				return true;
 			}
-			for(int i = -1; i >= -max; --i) {
+			for(int i = -1; i >= -max; i--) {
 				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
 					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
 						validMoves.add(new Point(row+i, col));
@@ -440,51 +440,51 @@ public class ServerGameManager implements Runnable {
 				else
 					break;
 			}
-//			// Positive Col (RIGHT)
-//			for(int i = 1; i <= max; ++i) {
-//				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
-//					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
-//						validMoves.add(new Point(row, col+i));
-//
-//						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
-//							break;
-//					}
-//					else
-//						break;
-//				}
-//				else
-//					break;
-//			}
-//			// Positive Row (DOWN)
-//			for(int i = 1; i <= max; ++i) {
-//				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
-//					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
-//						validMoves.add(new Point(row+i, col));
-//
-//						if(!isNullPiece(row+i, col, board) && isOpponentPiece(row+i, col, inColor, board))
-//							break;
-//					}
-//					else
-//						break;
-//				}
-//				else
-//					break;
-//			}
-//			// Negative Col (LEFT)
-//			for(int i = -1; i >= -max; --i) {
-//				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
-//					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
-//						validMoves.add(new Point(row, col+i));
-//
-//						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
-//							break;
-//					}
-//					else
-//						break;
-//				}
-//				else
-//					break;
-//			}
+			// Positive Col (RIGHT)
+			for(int i = 1; i <= max; ++i) {
+				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
+					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
+						validMoves.add(new Point(row, col+i));
+
+						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
+							break;
+					}
+					else
+						break;
+				}
+				else
+					break;
+			}
+			// Positive Row (DOWN)
+			for(int i = 1; i <= max; ++i) {
+				if(isInBounds(row+i,col) && (!isLake(row+i, col) || (!isNullPiece(row+i, col, board) && !isOpponentPiece(row+i, col, inColor, board)))) {
+					if(isNullPiece(row+i, col, board) || isOpponentPiece(row+i, col, inColor, board)) {
+						validMoves.add(new Point(row+i, col));
+
+						if(!isNullPiece(row+i, col, board) && isOpponentPiece(row+i, col, inColor, board))
+							break;
+					}
+					else
+						break;
+				}
+				else
+					break;
+			}
+			// Negative Col (LEFT)
+			for(int i = -1; i >= -max; --i) {
+				if(isInBounds(row,col+i) && (!isLake(row, col+i) || (!isNullPiece(row, col+i, board) && !isOpponentPiece(row, col+i, inColor, board)))) {
+					if(isNullPiece(row, col+i, board) || isOpponentPiece(row, col+i, inColor, board)) {
+						validMoves.add(new Point(row, col+i));
+
+						if(!isNullPiece(row, col+i, board) && isOpponentPiece(row, col+i, inColor, board))
+							break;
+					}
+					else
+						break;
+				}
+				else
+					break;
+			}
 		}
 
 		return false;

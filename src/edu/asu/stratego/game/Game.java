@@ -50,6 +50,13 @@ public class Game {
         Game.player = player;
     }
 
+    public static void setPlayerColor() {
+        if (Game.getOpponent().getColor() == PieceColor.RED)
+            Game.getPlayer().setColor(PieceColor.BLUE);
+        else
+            Game.getPlayer().setColor(PieceColor.RED);
+    }
+
     /**
      * @return Player object containing information about the opponent.
      */

@@ -7,9 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 public class ServerGameManagerTests {
     ServerGameManager server;
@@ -22,7 +22,6 @@ public class ServerGameManagerTests {
     @Before
     public void setUp() throws NoSuchMethodException {
         server = new ServerGameManager(sockOne, sockTwo, ++session);
-        board = new ServerBoard();
         checkWinConditions = server.getClass().getDeclaredMethod("checkWinCondition", ServerBoard.class);
         checkWinConditions.setAccessible(true);
 
@@ -32,24 +31,24 @@ public class ServerGameManagerTests {
 
     @Test
     public void givenRedHasNoMovesThenBlueWins() throws InvocationTargetException, IllegalAccessException {
-        for (int row = 0; row < 10; row++) {
-            for (int col = 0; col < 10; col++) {
-                board.getSquare(row, col).setPiece(new Piece(PieceType.CAPTAIN, PieceColor.BLUE, true));
-            }
-        }
-        assertEquals(GameStatus.RED_NO_MOVES, checkWinConditions.invoke(server, board));
+    	board = new ServerBoard();
+        board.getSquare(1, 1).setPiece(new Piece(PieceType.CAPTAIN, PieceColor.BLUE, true));
+        GameStatus status = (GameStatus) checkWinConditions.invoke(server, board);
+        assertThat(status.toString(), is("RED_NO_MOVES"));
     }
 
     @Test
     public void givenRedAndBlueHaveNoMovesThenGameEnds() throws InvocationTargetException, IllegalAccessException {
+    	board = new ServerBoard();
         board.getSquare(0, 9).setPiece(new Piece(PieceType.FLAG, PieceColor.BLUE, true));
         board.getSquare(9, 9).setPiece(new Piece(PieceType.FLAG, PieceColor.RED, false));
-        GameStatus status = GameStatus.class.cast(checkWinConditions.invoke(server, board));
-        assertTrue(status != GameStatus.IN_PROGRESS);
+        GameStatus status = (GameStatus) checkWinConditions.invoke(server, board);
+        assertThat(status.toString(), is(not("IN_PROGRESS")));
     }
 
     @Test
     public void givenRedAndBlueHaveAFlagButNoMovesThenGameShouldTie() throws InvocationTargetException, IllegalAccessException {
+    	board = new ServerBoard();
         board.getSquare(0, 9).setPiece(new Piece(PieceType.FLAG, PieceColor.BLUE, true));
         board.getSquare(9, 9).setPiece(new Piece(PieceType.FLAG, PieceColor.RED, false));
         GameStatus status = GameStatus.class.cast(checkWinConditions.invoke(server, board));
@@ -62,6 +61,7 @@ public class ServerGameManagerTests {
 
     @Test
     public void givenABombThenNoValidMovesAvailable() throws InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+    	board = new ServerBoard();
         board.getSquare(0,0).setPiece(bomb);
         boolean availableMoves = (boolean) (computeValidMoves.invoke(server,0, 0, bomb, board));
         assertFalse("Bomb had available moves", availableMoves);

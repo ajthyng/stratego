@@ -110,12 +110,9 @@ public class ClientGameManager implements Runnable {
             // Exchange player information.
             toServer.writeObject(Game.getPlayer());
             Game.setOpponent((Player) fromServer.readObject());
-
+            Game.setPlayerColor();
             // Infer player color from opponent color.
-            if (Game.getOpponent().getColor() == PieceColor.RED)
-                Game.getPlayer().setColor(PieceColor.BLUE);
-            else
-                Game.getPlayer().setColor(PieceColor.RED);
+            
         }
         catch (IOException | ClassNotFoundException e) {
             // TODO Handle this exception somehow...
@@ -178,6 +175,10 @@ public class ClientGameManager implements Runnable {
             return 1;
         }
         return 0;
+    }
+
+    private PieceColor getPlayerColor() {
+        return Game.getPlayer().getColor();
     }
 
     private void playGame() {

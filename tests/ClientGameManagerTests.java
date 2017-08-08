@@ -1,4 +1,5 @@
 import edu.asu.stratego.game.ClientGameManager;
+import edu.asu.stratego.game.Game;
 import edu.asu.stratego.game.PieceColor;
 import edu.asu.stratego.game.Player;
 import edu.asu.stratego.gui.ClientStage;
@@ -22,7 +23,7 @@ public class ClientGameManagerTests {
     @Before
     public void setUp() throws NoSuchMethodException {
         client = new ClientGameManager(new ClientStage());
-        getPlayerColor = client.getClass().getDeclaredMethod("getPlayerColor", Player.class);
+        getPlayerColor = client.getClass().getDeclaredMethod("getPlayerColor");
         getPlayerColor.setAccessible(true);
 
         calculateShift = client.getClass().getDeclaredMethod("calculateShift", int.class);
@@ -33,14 +34,20 @@ public class ClientGameManagerTests {
     public void givenBlueOpponentThenPlayerIsRed() throws InvocationTargetException, IllegalAccessException {
         Player pOne = new Player();
         pOne.setColor(PieceColor.BLUE);
-        assertEquals(PieceColor.RED, getPlayerColor.invoke(client, pOne));
+        new Game();
+        Game.setOpponent(pOne);
+        Game.setPlayerColor();
+        assertEquals(PieceColor.RED, getPlayerColor.invoke(client));
     }
 
     @Test
     public void givenRedOpponentThenPlayerIsBlue() throws InvocationTargetException, IllegalAccessException {
         Player pOne = new Player();
         pOne.setColor(PieceColor.RED);
-        assertEquals(PieceColor.BLUE, getPlayerColor.invoke(client, pOne));
+        new Game();
+        Game.setOpponent(pOne);
+        Game.setPlayerColor();
+        assertEquals(PieceColor.BLUE, getPlayerColor.invoke(client));
     }
 
     @Test
