@@ -1,28 +1,30 @@
-package edu.asu.stratego.game;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import edu.asu.stratego.game.Move;
+import edu.asu.stratego.game.PieceColor;
+import edu.asu.stratego.game.PieceType;
 
 import java.awt.*;
 
-class MoveTest {
+public class MoveTest {
     Move testMove = new Move();
     Point start = new Point(-1, -1);
     Point end   = new Point(-1, -1);
 
     @Test
-    void isAttackMove() {
+    public void isAttackMove() {
         boolean isAttack = false;
         System.out.println("isAttackMove Should return false. Actual result: " + isAttack);
     }
 
     @Test
-    void setAttackMove() {
+    public void setAttackMove() {
         testMove.setAttackMove(true);
         boolean result = testMove.isAttackMove();
         System.out.println("setAttackMove sets isAttack, should return true. Actual result: " + result);
     }
 
     @Test
-    void isPieceSelected() {
+    public void isPieceSelected() {
         start.x = 2; start.y = 2;
         boolean result = testMove.isPieceSelected();
         System.out.println("isPieceSelected Should return false. Actual result: " + result);
@@ -30,7 +32,7 @@ class MoveTest {
     }
 
     @Test
-    void getRowStart() {
+    public void getRowStart() {
         start.x = -1;
         int result = testMove.getRowStart();
         System.out.println("getRowStart Should return -1. Actual result: " + result);
@@ -38,74 +40,74 @@ class MoveTest {
     }
 
     @Test
-    void getColStart() {
+    public void getColStart() {
         start.y = -1;
         int result = testMove.getColStart();
         System.out.println("getColStart Should return -1. Actual result: " + result);
     }
 
     @Test
-    void getStart() {
+    public void getStart() {
         Point result = testMove.getStart();
         System.out.println("getStart should be (-1, -1) " + result);
     }
 
     @Test
-    void getEnd() {
+    public void getEnd() {
         Point result = testMove.getEnd();
         System.out.println("getEnd should be (-1, -1) " + result);
     }
 
     @Test
-    void setStart() {
+    public void setStart() {
         testMove.setStart(2,2);
         Point result = testMove.getStart();
         System.out.println("setStart should be (2,2). Actual result: " + result);
     }
 
     @Test
-    void setEnd() {
+    public void setEnd() {
         testMove.setEnd(5,3);
         Point result = testMove.getEnd();
         System.out.println("setEnd should be (5,3). Actual Result: " + result);
     }
 
     @Test
-    void getMoveColor() {
+    public void getMoveColor() {
         testMove.setMoveColor(PieceColor.RED);
         PieceColor result = testMove.getMoveColor();
         System.out.println("getMoveColor should be red. Actaul result: "+ result + " This test also test setMoveColor");
     }
 
     @Test
-    void setMoveColor() {
+    public void setMoveColor() {
         //See getmoveColor
     }
 
     @Test
-    void getStartPiece() {
+    public void getStartPiece() {
         PieceType type = PieceType.SCOUT;
         System.out.println("getStartPiece should be SCOUT. Actual result: " + type);
     }
 
     @Test
-    void setStartPiece() {
+    public void setStartPiece() {
         //See getStartPiece
     }
 
     @Test
-    void getEndPiece() {
+    public void getEndPiece() {
         PieceType type = PieceType.MINER;
         System.out.println("getEndPiece should be MINER. Actual result: " + type);
     }
 
     @Test
-    void setEndPiece() {
+    public void setEndPiece() {
         //See getEndPiece
     }
 
     @Test
-    void isAttackWin() {
+    public void isAttackWin() {
         testMove.setAttackWin(true);
         boolean result = testMove.isAttackWin();
         System.out.println("isAttackWin should be true. Actual result: " + result);
@@ -113,19 +115,19 @@ class MoveTest {
     }
 
     @Test
-    void setAttackWin() {
+    public void setAttackWin() {
         //see isAttackWin
     }
 
     @Test
-    void isDefendWin() {
+    public void isDefendWin() {
         testMove.setDefendWin(false);
         boolean result = testMove.isDefendWin();
         System.out.println("isDefendWin Should be false. Actual result: " + result);
     }
 
     @Test
-    void setDefendWin() {
+    public void setDefendWin() {
         //See isDefendWin
     }
 

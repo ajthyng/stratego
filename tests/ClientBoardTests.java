@@ -30,6 +30,6 @@ public class ClientBoardTests {
 
     @Test(expected = NullPointerException.class)
     public void givenAnOffBoardLocationThenNullShouldReturn() {
-        Piece retrievedFlag = board.getSquare(0, -1).getPiece();
+        board.getSquare(0, -1).getPiece();
     }
 }

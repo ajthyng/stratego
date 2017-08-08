@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
         ClientGameManagerTests.class,
         PlaySoundTests.class,
         ServerGameManagerTests.class,
-        SetupBoardTests.class
+        SetupBoardTests.class,
+        MoveTest.class
 })
 public class TestSuite {}
