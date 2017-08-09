@@ -1,21 +1,26 @@
+package edu.asu.stratego.game;
+
 import org.junit.Test;
-import edu.asu.stratego.game.Move;
-import edu.asu.stratego.game.PieceColor;
-import edu.asu.stratego.game.PieceType;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 
 import java.awt.*;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 public class MoveTest {
     Move testMove = new Move();
+    Move testMove2 = new Move();
     Point start = new Point(-1, -1);
     Point end   = new Point(-1, -1);
 
     @Test
     public void isAttackMove() {
-        boolean isAttack = false;
-        assertThat(isAttack, is(false));
+        testMove.setAttackMove(true);
+        boolean result = testMove.isAttackMove();
+        testMove2.setAttackMove(false);
+        boolean result2 = testMove2.isAttackMove();
+        assertThat(result, is(true));
+        assertThat(result2, is(false));
 //        System.out.println("isAttackMove Should return false. Actual result: " + isAttack);
     }
 
@@ -23,33 +28,40 @@ public class MoveTest {
     public void setAttackMove() {
         testMove.setAttackMove(true);
         boolean result = testMove.isAttackMove();
+        testMove2.setAttackMove(false);
+        boolean result2 = testMove2.isAttackMove();
         assertThat(result, is(true));
+        assertThat(result2, is(false));
 //        System.out.println("setAttackMove sets isAttack, should return true. Actual result: " + result);
     }
 
     @Test
     public void isPieceSelected() {
-        start.x = 2; start.y = 2;
+        testMove.setStart(-1,-1);
         boolean result = testMove.isPieceSelected();
         assertThat(result, is(false));
+        testMove2.setStart(5,5);
+        boolean result2 = testMove2.isPieceSelected();
+        assertThat(result2, is(true));
+
 //        System.out.println("isPieceSelected Should return false. Actual result: " + result);
 
     }
 
     @Test
     public void getRowStart() {
-        start.x = -1;
+        testMove.setStart(2,2);
         int result = testMove.getRowStart();
-        assertThat(result, is(-1));
+        assertThat(result, is(2));
 //        System.out.println("getRowStart Should return -1. Actual result: " + result);
 
     }
 
     @Test
     public void getColStart() {
-        start.y = -1;
+        testMove.setStart(2,2);
         int result = testMove.getColStart();
-        assertThat(result, is(-1));
+        assertThat(result, is(2));
 //        System.out.println("getColStart Should return -1. Actual result: " + result);
     }
 
@@ -88,12 +100,17 @@ public class MoveTest {
         testMove.setMoveColor(PieceColor.RED);
         PieceColor result = testMove.getMoveColor();
         assertThat(result.toString(), is("RED"));
-//        System.out.println("getMoveColor should be red. Actaul result: "+ result + " This test also test setMoveColor");
+//        System.out.println("getMoveColor should be red. Actual result: "+ result + " This test also test setMoveColor");
     }
 
     @Test
     public void setMoveColor() {
-        //See getmoveColor
+        testMove.setMoveColor(PieceColor.RED);
+        PieceColor result = testMove.getMoveColor();
+        assertThat(result.toString(), is("RED"));
+        testMove2.setMoveColor(PieceColor.BLUE);
+        PieceColor result2 = testMove2.getMoveColor();
+        assertThat(result2.toString(), is("BLUE"));
     }
 
     @Test
@@ -105,7 +122,7 @@ public class MoveTest {
 
     @Test
     public void setStartPiece() {
-        //See getStartPiece
+
     }
 
     @Test
@@ -140,11 +157,20 @@ public class MoveTest {
         boolean result = testMove.isDefendWin();
         assertThat(result, is(false));
 //        System.out.println("isDefendWin Should be false. Actual result: " + result);
+        testMove2.setDefendWin(true);
+        boolean result2 = testMove2.isDefendWin();
+        assertThat(result2, is(true));
     }
 
     @Test
     public void setDefendWin() {
-        //See isDefendWin
+        testMove.setDefendWin(false);
+        boolean result = testMove.isDefendWin();
+        assertThat(result, is(false));
+//        System.out.println("isDefendWin Should be false. Actual result: " + result);
+        testMove2.setDefendWin(true);
+        boolean result2 = testMove2.isDefendWin();
+        assertThat(result2, is(true));
     }
 
 }
