@@ -1,6 +1,6 @@
-package edu.asu.stratego.game;
-
-import org.junit.jupiter.api.Test;
+import edu.asu.stratego.game.PieceColor;
+import edu.asu.stratego.game.Player;
+import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
